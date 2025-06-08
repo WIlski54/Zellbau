@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pflanzenzelle - Interaktives Arbeitsblatt</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            min-height: 100vh;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3em;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 30px rgba(0, 255, 136, 0.5); }
+            to { text-shadow: 0 0 40px rgba(0, 204, 255, 0.8); }
+        }
+
+        .info-panel {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .info-toggle {
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            border: none;
+            color: #000;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+        }
+
+        .info-toggle:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 255, 136, 0.6);
+        }
+
+        .info-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out;
+        }
+
+        .info-content.show {
+            max-height: 1000px;
+        }
+
+        .info-section {
+            margin: 15px 0;
+            padding: 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            border-left: 3px solid #00ff88;
+        }
+
+        .task-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .task-header {
+            color: #00ccff;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .task-icon {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(45deg, #00ff88, #00ccff);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #000;
+        }
+
+        .cell-diagram {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .cell-image {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            position: relative;
+            text-align: center;
+        }
+
+        .cell-image img {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .label-inputs {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .input-group {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group label {
+            min-width: 30px;
+            color: #00ff88;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 8px 15px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+            border-radius: 25px;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+
+        .correct {
+            border-color: #00ff88 !important;
+            background: rgba(0, 255, 136, 0.1) !important;
+        }
+
+        .incorrect {
+            border-color: #ff4444 !important;
+            background: rgba(255, 68, 68, 0.1) !important;
+        }
+
+        .check-btn {
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            border: none;
+            color: #000;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            margin: 20px 0;
+            transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .check-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.6);
+        }
+
+        .quiz-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .quiz-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .quiz-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+        }
+
+        .quiz-options {
+            margin-top: 15px;
+        }
+
+        .quiz-option {
+            display: block;
+            margin: 8px 0;
+            cursor: pointer;
+        }
+
+        .quiz-option input {
+            margin-right: 10px;
+        }
+
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .result.show {
+            opacity: 1;
+        }
+
+        .result.success {
+            background: rgba(0, 255, 136, 0.2);
+            border: 1px solid #00ff88;
+        }
+
+        .result.error {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+        }
+
+        .note {
+            background: rgba(255, 217, 61, 0.1);
+            border: 1px solid rgba(255, 217, 61, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+            color: #ffd93d;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2em;
+            }
+            .cell-diagram {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧬 Die Pflanzenzelle 🧬</h1>
+            <p style="color: #00ccff; margin-top: 10px;">Entdecke die faszinierende Welt der Zellbiologie</p>
+        </div>
+
+        <div class="info-panel">
+            <button class="info-toggle" onclick="toggleInfo()">
+                📚 Informationen ein-/ausblenden
+            </button>
+            <div class="info-content" id="infoContent">
+                <div class="info-section">
+                    <h3 style="color: #00ff88; margin-bottom: 10px;">🌱 Die Pflanzenzelle - Ein Meisterwerk der Natur</h3>
+                    <p>Pflanzenzellen sind die Grundbausteine aller Pflanzen. Sie unterscheiden sich von tierischen Zellen durch einige besondere Strukturen:</p>
+                </div>
+                
+                <div class="info-section">
+                    <h4 style="color: #00ccff; margin-bottom: 8px;">Die wichtigsten Organellen:</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li>🔸 <strong>Zellwand:</strong> Stabile Außenhülle aus Zellulose, gibt der Zelle Form und Schutz</li>
+                        <li>🔸 <strong>Zellmembran:</strong> Kontrolliert den Stoffaustausch zwischen Zelle und Umgebung</li>
+                        <li>🔸 <strong>Endoplasmatisches Retikulum (ER):</strong> Transportsystem der Zelle</li>
+                        <li>🔸 <strong>Zellkern:</strong> Steuerzentrale mit Erbinformation (DNA)</li>
+                        <li>🔸 <strong>Kernkörperchen (Nucleolus):</strong> Ort der Ribosomenbildung im Zellkern</li>
+                        <li>🔸 <strong>Chloroplasten:</strong> Photosynthese-Fabriken, produzieren Zucker und Sauerstoff</li>
+                        <li>🔸 <strong>Vakuole:</strong> Großer Speicher für Wasser und Nährstoffe</li>
+                        <li>🔸 <strong>Mitochondrien:</strong> Kraftwerke der Zelle, liefern Energie (ATP)</li>
+                        <li>🔸 <strong>Lysosomen:</strong> Verdauungsorganellen, bauen zelleigene und zellfremde Stoffe ab</li>
+                        <li>🔸 <strong>Golgi-Apparat:</strong> Verpackungs- und Versandzentrum für Proteine</li>
+                        <li>🔸 <strong>Cytoplasma:</strong> Gelartiger Zellinhalt, in dem die Organellen schwimmen</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h4 style="color: #00ccff; margin-bottom: 8px;">💡 Wusstest du schon?</h4>
+                    <p>• Eine einzige Pflanzenzelle kann bis zu 90% aus Wasser bestehen!</p>
+                    <p>• Chloroplasten waren ursprünglich eigenständige Bakterien, die vor Milliarden Jahren in die Zelle aufgenommen wurden.</p>
+                    <p>• Die Zellwand kann bis zu 0,1 mm dick werden - das ist für eine Zelle gigantisch!</p>
+                    <p>• Die Vakuole kann bis zu 80% des Zellvolumens einnehmen!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-section">
+            <div class="task-header">
+                <div class="task-icon">1</div>
+                <h2>Aufgabe 1: Beschrifte die Pflanzenzelle</h2>
+            </div>
+            
+            <div class="cell-diagram">
+                <div class="cell-image">
+                    <img src="Zelle2.jpg" alt="Pflanzenzelle mit nummerierten Organellen">
+                </div>
+                
+                <div class="label-inputs">
+                    <div class="input-group">
+                        <label>1:</label>
+                        <input type="text" id="label1" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>2:</label>
+                        <input type="text" id="label2" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>3:</label>
+                        <input type="text" id="label3" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>4:</label>
+                        <input type="text" id="label4" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>5:</label>
+                        <input type="text" id="label5" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>6:</label>
+                        <input type="text" id="label6" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>7:</label>
+                        <input type="text" id="label7" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>8:</label>
+                        <input type="text" id="label8" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>9:</label>
+                        <input type="text" id="label9" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>10:</label>
+                        <input type="text" id="label10" placeholder="Organelle eingeben...">
+                    </div>
+                    <div class="input-group">
+                        <label>11:</label>
+                        <input type="text" id="label11" placeholder="Organelle eingeben...">
+                    </div>
+                    
+                    <button class="check-btn" onclick="checkLabels()">✓ Antworten überprüfen</button>
+                    <div id="labelResult" class="result"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="task-section">
+            <div class="task-header">
+                <div class="task-icon">2</div>
+                <h2>Aufgabe 2: Teste dein Wissen!</h2>
+            </div>
+            
+            <div class="quiz-container">
+                <div class="quiz-card">
+                    <h3 style="color: #00ff88;">Frage 1:</h3>
+                    <p>Welche Organelle ist für die Photosynthese verantwortlich?</p>
+                    <div class="quiz-options">
+                        <label class="quiz-option">
+                            <input type="radio" name="q1" value="a">
+                            Mitochondrien
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q1" value="b">
+                            Chloroplasten
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q1" value="c">
+                            Zellkern
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-card">
+                    <h3 style="color: #00ff88;">Frage 2:</h3>
+                    <p>Was unterscheidet eine Pflanzenzelle von einer Tierzelle?</p>
+                    <div class="quiz-options">
+                        <label class="quiz-option">
+                            <input type="radio" name="q2" value="a">
+                            Pflanzenzellen haben keinen Zellkern
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q2" value="b">
+                            Pflanzenzellen haben eine Zellwand
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q2" value="c">
+                            Pflanzenzellen haben keine Mitochondrien
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-card">
+                    <h3 style="color: #00ff88;">Frage 3:</h3>
+                    <p>Woraus besteht die Zellwand hauptsächlich?</p>
+                    <div class="quiz-options">
+                        <label class="quiz-option">
+                            <input type="radio" name="q3" value="a">
+                            Protein
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q3" value="b">
+                            Zellulose
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q3" value="c">
+                            DNA
+                        </label>
+                    </div>
+                </div>
+
+                <div class="quiz-card">
+                    <h3 style="color: #00ff88;">Frage 4:</h3>
+                    <p>Welche Funktion hat die Vakuole?</p>
+                    <div class="quiz-options">
+                        <label class="quiz-option">
+                            <input type="radio" name="q4" value="a">
+                            Energieproduktion
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q4" value="b">
+                            Speicherung von Wasser und Nährstoffen
+                        </label>
+                        <label class="quiz-option">
+                            <input type="radio" name="q4" value="c">
+                            Proteinsynthese
+                        </label>
+                    </div>
+                </div>
+            </div>
+            
+            <button class="check-btn" onclick="checkQuiz()">✓ Quiz auswerten</button>
+            <div id="quizResult" class="result"></div>
+        </div>
+
+        <div class="task-section">
+            <div class="task-header">
+                <div class="task-icon">3</div>
+                <h2>Aufgabe 3: Zuordnung - Funktion und Organelle</h2>
+            </div>
+            
+            <p style="margin-bottom: 20px;">Verbinde die Funktionen mit den richtigen Organellen durch Eingabe der Buchstaben:</p>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div>
+                    <h4 style="color: #00ff88; margin-bottom: 10px;">Funktionen:</h4>
+                    <p>A) Energiegewinnung durch Zellatmung</p>
+                    <p>B) Speicherung von Wasser und Nährstoffen</p>
+                    <p>C) Proteinsynthese</p>
+                    <p>D) Photosynthese</p>
+                    <p>E) Schutz und Stabilität</p>
+                    <p>F) Transport von Stoffen</p>
+                    <p>G) Verpackung und Modifikation von Proteinen</p>
+                </div>
+                
+                <div>
+                    <h4 style="color: #00ccff; margin-bottom: 10px;">Organellen:</h4>
+                    <div class="input-group">
+                        <span>Chloroplasten:</span>
+                        <input type="text" id="match1" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                    <div class="input-group">
+                        <span>Mitochondrien:</span>
+                        <input type="text" id="match2" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                    <div class="input-group">
+                        <span>Vakuole:</span>
+                        <input type="text" id="match3" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                    <div class="input-group">
+                        <span>Ribosomen:</span>
+                        <input type="text" id="match4" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                    <div class="input-group">
+                        <span>Zellwand:</span>
+                        <input type="text" id="match5" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                    <div class="input-group">
+                        <span>Endoplasmatisches Retikulum:</span>
+                        <input type="text" id="match6" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                    <div class="input-group">
+                        <span>Golgi-Apparat:</span>
+                        <input type="text" id="match7" maxlength="1" style="width: 50px; text-align: center;">
+                    </div>
+                </div>
+            </div>
+            
+            <button class="check-btn" onclick="checkMatching()">✓ Zuordnung überprüfen</button>
+            <div id="matchResult" class="result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Korrekte Antworten basierend auf dem Bild
+        const correctLabels = {
+            1: ['zellwand', 'zell-wand', 'zell wand'],
+            2: ['zellmembran', 'zell-membran', 'zell membran', 'membran', 'plasmamembran'],
+            3: ['er', 'endoplasmatisches retikulum', 'endoplasmatisches reticulum', 'raues er', 'raues endoplasmatisches retikulum', 'raues endoplasmatisches reticulum'],
+            4: ['zellkern', 'kern', 'nucleus', 'nukleus', 'zell-kern'],
+            5: ['nucleolus', 'nukleolus', 'kernkörperchen', 'kernkörper'],
+            6: ['chloroplast', 'chloroplasten', 'plastid', 'plastiden'],
+            7: ['vakuole', 'zentralvakuole', 'zellsaftvakuole', 'zellsaft-vakuole', 'zellsaft vakuole'],
+            8: ['mitochondrium', 'mitochondrien', 'mitochondrion'],
+            9: ['lysosom', 'lysosomen'],
+            10: ['golgi-apparat', 'golgi apparat', 'golgiapparat', 'golgi', 'dictyosom'],
+            11: ['cytoplasma', 'zellplasma', 'zytoplasma']
+        };
+
+        function toggleInfo() {
+            const content = document.getElementById('infoContent');
+            content.classList.toggle('show');
+        }
+
+        function checkLabels() {
+            let correct = 0;
+            let total = 11;
+
+            for (let i = 1; i <= total; i++) {
+                const input = document.getElementById(`label${i}`);
+                const value = input.value.toLowerCase().trim();
+                
+                if (correctLabels[i].includes(value)) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                    correct++;
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                }
+            }
+
+            const result = document.getElementById('labelResult');
+            if (correct === total) {
+                result.textContent = '🎉 Perfekt! Alle Organellen richtig benannt!';
+                result.className = 'result success show';
+            } else {
+                result.textContent = `${correct} von ${total} richtig. Versuche es noch einmal!`;
+                result.className = 'result error show';
+            }
+        }
+
+        function checkQuiz() {
+            const answers = {
+                q1: 'b',
+                q2: 'b',
+                q3: 'b',
+                q4: 'b'
+            };
+
+            let correct = 0;
+            let total = 4;
+
+            for (let q in answers) {
+                const selected = document.querySelector(`input[name="${q}"]:checked`);
+                if (selected && selected.value === answers[q]) {
+                    correct++;
+                }
+            }
+
+            const result = document.getElementById('quizResult');
+            if (correct === total) {
+                result.textContent = '🎉 Ausgezeichnet! Alle Fragen richtig beantwortet!';
+                result.className = 'result success show';
+            } else {
+                result.textContent = `${correct} von ${total} richtig. Schau dir die Informationen noch einmal an!`;
+                result.className = 'result error show';
+            }
+        }
+
+        function checkMatching() {
+            const correctMatches = {
+                match1: 'd',
+                match2: 'a',
+                match3: 'b',
+                match4: 'c',
+                match5: 'e',
+                match6: 'f',
+                match7: 'g'
+            };
+
+            let correct = 0;
+            let total = 7;
+
+            for (let match in correctMatches) {
+                const input = document.getElementById(match);
+                const value = input.value.toLowerCase().trim();
+                
+                if (value === correctMatches[match]) {
+                    input.classList.remove('incorrect');
+                    input.classList.add('correct');
+                    correct++;
+                } else {
+                    input.classList.remove('correct');
+                    input.classList.add('incorrect');
+                }
+            }
+
+            const result = document.getElementById('matchResult');
+            if (correct === total) {
+                result.textContent = '🎉 Super! Alle Zuordnungen sind richtig!';
+                result.className = 'result success show';
+            } else {
+                result.textContent = `${correct} von ${total} richtig. Überlege noch einmal!`;
+                result.className = 'result error show';
+            }
+        }
+
+        // Alle Eingaben in Großbuchstaben umwandeln
+        document.querySelectorAll('#match1, #match2, #match3, #match4, #match5, #match6, #match7').forEach(input => {
+            input.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+        });
+    </script>
+</body>
+</html>
